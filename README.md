@@ -11,5 +11,6 @@ To virtualize SGX-capable environments, use the following command:
 `
 qemu-sgx/x86_64-softmmu/qemu-system-x86_64 -m 1G -sgx epc=64MB -enable-kvm -cpu host -smp 2,sockets=1,cores=2 -machine kernel_irqchip=split
 `
+
 To test co-operation speedup for sgx thread as in [HotCalls](http://doi.acm.org/10.1145/3079856.3080208), you need at least 2 logical processors available.
 
