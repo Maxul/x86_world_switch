@@ -7,9 +7,9 @@
 
 #define GETTIME_TIMES (50000)
 
-#define VIRT
-#define SMM
-#define SGX
+#define VMM_TEST
+#define SMM_TEST
+#define SGX_TEST
 
 typedef struct {
     bool            isReady;

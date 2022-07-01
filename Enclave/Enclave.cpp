@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2017 Intel Corporation. All rights reserved.
+ * Copyright (C) 2011-2021 Intel Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -54,10 +54,10 @@ void printf(const char *fmt, ...)
 
 void ecall_sample(void) {}
 
-void ocall_test()
+void ocall_batch_test()
 {
 	for (int i = 0; i < N; i++) {
-	    ocall();
+	    ocall_sample();
 	}
 }
 
@@ -88,7 +88,9 @@ void gettimeofday_test()
 	}
 }
 
-void ecall_malloc_test(int sz)
+static int _deadbeaf;
+
+void ecall_malloc_test(size_t sz)
 {
     for (int i = 0; i < MALLOC_TIMES; i++) {
         unsigned char *tmp = (unsigned char *)malloc(sz);
@@ -99,20 +101,19 @@ void ecall_malloc_test(int sz)
     }
 }
 
-void ecall_memset_test(int sz)
+void ecall_memset_test(size_t sz)
 {
-    //unsigned char *buffer = (unsigned char *)malloc(sz);
-    unsigned char buffer[1<<24];
+    unsigned char *buffer = (unsigned char *)malloc(sz);
     for (int i = 0; i < MEMSET_TIMES; i++) {
         if (NULL == buffer) {
             printf("malloc %lu failed\n", sz); break;
         }
         memset(buffer, 0xa, sz);
     }
-    //free(buffer);
+    free(buffer);
 }
 
-void ecall_memset_plain(int sz, void *pOutside)
+void ecall_memset_plain(size_t sz, void *pOutside)
 {
 //    printf("outside %p\n", pOutside);
     for (int i = 0; i < MEMSET_TIMES; i++) {
@@ -124,7 +125,7 @@ void ecall_memset_plain(int sz, void *pOutside)
 }
 
 #define BUFLEN (1<<12)	// Max length of buffer
-void ecall_sendto_test(int fd, void *addr, int addrlen)
+void ecall_sendto_test(int fd, void *addr, unsigned int addrlen)
 {
     int s = fd;
     char message[BUFLEN];
@@ -142,7 +143,7 @@ void ecall_sendto_test(int fd, void *addr, int addrlen)
     }
 }
 
-void ecall_sendto_nocopy_test(int fd, void *buf, int buflen, void *addr, int addrlen)
+void ecall_sendto_nocopy_test(int fd, void *buf, int buflen, void *addr, unsigned int addrlen)
 {
     int s = fd;
 	int retv;
@@ -159,13 +160,13 @@ void ecall_sendto_nocopy_test(int fd, void *buf, int buflen, void *addr, int add
     }
 }
 
-void ecall_concurrent_sendto(void *buf, int buflen, int cpu_mhz)
+void ecall_concurrent_sendto(void *buf, int buflen, uint64_t cpu_mhz)
 {
 	long long unsigned int ticks, diff;
 
     Triones *t = (Triones *)buf;
 //printf("Triones_buffer %p %p\n", buf, t->data);
-    memset(t->data, 'T', 1<<12);
+    memset(t->data, 'T', buflen);
 
     rdtscllp(&ticks);
 	for (int i = 0; i < SENDTO_TIMES; ++i) {

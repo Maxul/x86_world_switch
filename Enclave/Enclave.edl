@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2017 Intel Corporation. All rights reserved.
+ * Copyright (C) 2011-2021 Intel Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,24 +42,25 @@ enclave {
      */
     trusted {
 		public void ecall_sample(void);
-		public void ocall_test(void);
+		public void ocall_batch_test(void);
 		public void gettimeofday_test(void);
 		
-		public void ecall_malloc_test(int sz);
-		public void ecall_memset_test(int sz);
-		public void ecall_memset_plain(int sz, [user_check] void *pOutside);
-		public void ecall_sendto_test(int fd, [in, out, size=addrlen] void *addr, int addrlen);
-		public void ecall_sendto_nocopy_test(int fd, [user_check] void *buf, int buflen, [in, out, size=addrlen] void *addr, int addrlen);
-		public void ecall_concurrent_sendto([user_check] void *buf, int buflen, int cpu_mhz);
+		public void ecall_malloc_test(size_t sz);
+		public void ecall_memset_test(size_t sz);
+		public void ecall_memset_plain(size_t sz, [user_check] void *pOutside);
+
+		public void ecall_sendto_test(int fd, [in, out, size=addrlen] void *addr, unsigned int addrlen);
+		public void ecall_sendto_nocopy_test(int fd, [user_check] void *buf, int buflen, [in, out, size=addrlen] void *addr, unsigned int addrlen);
+		public void ecall_concurrent_sendto([user_check] void *buf, int buflen, uint64_t cpu_mhz);
     };
 
 
     untrusted {
         void ocall_print_string([in, string] const char *str);
         unsigned long long rdtscllp();
-        void ocall(void);
-        
-        int ocall_sgx_gettimeofday([in, out, size=tv_size]void *tv, int tv_size);
+        void ocall_sample(void);
+
+        int ocall_sgx_gettimeofday([in, out, size=tv_size]void *tv, size_t tv_size);
         int ocall_sendto(int sockfd, [in, size=len]const void *buf, size_t len, int flags, [in, size=addrlen]const void *dest_addr, unsigned int addrlen);
         int ocall_do_sendto(int sockfd, [user_check]const void *buf, size_t len, int flags, [in, size=addrlen]const void *dest_addr, unsigned int addrlen);
     };
