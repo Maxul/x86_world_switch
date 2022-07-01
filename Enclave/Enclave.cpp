@@ -42,7 +42,7 @@
  * printf:
  *   Invokes OCALL to display the enclave buffer to the terminal.
  */
-void printf(const char *fmt, ...)
+int printf(const char *fmt, ...)
 {
     char buf[BUFSIZ] = {'\0'};
     va_list ap;
@@ -50,6 +50,7 @@ void printf(const char *fmt, ...)
     vsnprintf(buf, BUFSIZ, fmt, ap);
     va_end(ap);
     ocall_print_string(buf);
+    return 0;
 }
 
 void ecall_sample(void) {}
@@ -88,8 +89,6 @@ void gettimeofday_test()
 	}
 }
 
-static int _deadbeaf;
-
 void ecall_malloc_test(size_t sz)
 {
     for (int i = 0; i < MALLOC_TIMES; i++) {
@@ -125,11 +124,11 @@ void ecall_memset_plain(size_t sz, void *pOutside)
 }
 
 #define BUFLEN (1<<12)	// Max length of buffer
-void ecall_sendto_test(int fd, void *addr, unsigned int addrlen)
+void ecall_sendto_test(int fd, void *addr, size_t addrlen)
 {
     int s = fd;
     char message[BUFLEN];
-	int retv;
+	long int retv;
 	sgx_status_t sgx_retv;
 	
 	memset(message, 'A', sizeof(message));
@@ -143,10 +142,10 @@ void ecall_sendto_test(int fd, void *addr, unsigned int addrlen)
     }
 }
 
-void ecall_sendto_nocopy_test(int fd, void *buf, int buflen, void *addr, unsigned int addrlen)
+void ecall_sendto_nocopy_test(int fd, void *buf, int buflen, void *addr, size_t addrlen)
 {
     int s = fd;
-	int retv;
+	long int retv;
 	sgx_status_t sgx_retv;
 	
     memset(buf, 'A', buflen);
@@ -178,7 +177,7 @@ void ecall_concurrent_sendto(void *buf, int buflen, uint64_t cpu_mhz)
     }
     rdtscllp(&diff);
     diff -= ticks;
-    printf("ENCLAVE: concurrent sendto took \t%lu cycles == %lu us\n", diff, diff / cpu_mhz);
+    printf("ENCLAVE: concurrent sendto took \t%llu cycles == %llu us\n", diff, diff / cpu_mhz);
 }
 
 

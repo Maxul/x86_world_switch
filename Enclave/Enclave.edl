@@ -34,7 +34,7 @@
 enclave {
 	include "time.h"
 	from "sgx_tstdc.edl" import *;
-
+	
     /* Import ECALL/OCALL from sub-directory EDLs.
      *  [from]: specifies the location of EDL file. 
      *  [import]: specifies the functions to import, 
@@ -49,8 +49,8 @@ enclave {
 		public void ecall_memset_test(size_t sz);
 		public void ecall_memset_plain(size_t sz, [user_check] void *pOutside);
 
-		public void ecall_sendto_test(int fd, [in, out, size=addrlen] void *addr, unsigned int addrlen);
-		public void ecall_sendto_nocopy_test(int fd, [user_check] void *buf, int buflen, [in, out, size=addrlen] void *addr, unsigned int addrlen);
+		public void ecall_sendto_test(int fd, [in, out, size=addrlen] void *addr, size_t addrlen);
+		public void ecall_sendto_nocopy_test(int fd, [user_check] void *buf, int buflen, [in, out, size=addrlen] void *addr, size_t addrlen);
 		public void ecall_concurrent_sendto([user_check] void *buf, int buflen, uint64_t cpu_mhz);
     };
 
@@ -61,8 +61,8 @@ enclave {
         void ocall_sample(void);
 
         int ocall_sgx_gettimeofday([in, out, size=tv_size]void *tv, size_t tv_size);
-        int ocall_sendto(int sockfd, [in, size=len]const void *buf, size_t len, int flags, [in, size=addrlen]const void *dest_addr, unsigned int addrlen);
-        int ocall_do_sendto(int sockfd, [user_check]const void *buf, size_t len, int flags, [in, size=addrlen]const void *dest_addr, unsigned int addrlen);
+        long int ocall_sendto(int sockfd, [in, size=len]const void *buf, size_t len, int flags, [in, size=addrlen]const void *dest_addr, size_t addrlen);
+        long int ocall_do_sendto(int sockfd, [user_check]const void *buf, size_t len, int flags, [in, size=addrlen]const void *dest_addr, size_t addrlen);
     };
 
 };

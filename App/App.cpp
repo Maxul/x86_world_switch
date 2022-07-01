@@ -281,16 +281,16 @@ int ocall_sgx_gettimeofday(void *tv, size_t tv_size)
 	return gettimeofday((struct timeval *)tv, NULL);
 }
 
-int ocall_sendto(int sockfd, const void *buf, size_t len, int flags, const void *dest_addr_cast, unsigned int addrlen)
+long int ocall_sendto(int sockfd, const void *buf, size_t len, int flags, const void *dest_addr_cast, size_t addrlen)
 {
 	const struct sockaddr *dest_addr = (const struct sockaddr *)dest_addr_cast;
-	return sendto(sockfd, buf, len, flags, dest_addr, addrlen);
+	return sendto(sockfd, buf, len, flags, dest_addr, (socklen_t)addrlen);
 }
 
-int ocall_do_sendto(int sockfd, const void *buf, size_t len, int flags, const void *dest_addr_cast, unsigned int addrlen)
+long int ocall_do_sendto(int sockfd, const void *buf, size_t len, int flags, const void *dest_addr_cast, size_t addrlen)
 {
 	const struct sockaddr *dest_addr = (const struct sockaddr *)dest_addr_cast;
-	return sendto(sockfd, buf, len, flags, dest_addr, addrlen);
+	return sendto(sockfd, buf, len, flags, dest_addr, (socklen_t)addrlen);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -416,8 +416,7 @@ static void benchmark_ocall_sendto(void)
 {
     char message[BUFLEN];
     struct sockaddr_in si_other;
-    int i, s;
-    unsigned int slen = sizeof(si_other);
+    int i, s, slen = sizeof(si_other);
 	unsigned long ticks, diff;
 
 	memset(message, 'A', sizeof(message));
